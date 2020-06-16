@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  player_one: one
+  player_one_board: MyString
+  player_one_moves_board: MyString
+  player_two: one
+  player_two_board: MyString
+  player_two_moves_board: MyString
+  next_turn: false
+  status: 1
+
+two:
+  player_one: two
+  player_one_board: MyString
+  player_one_moves_board: MyString
+  player_two: two
+  player_two_board: MyString
+  player_two_moves_board: MyString
+  next_turn: false
+  status: 1
