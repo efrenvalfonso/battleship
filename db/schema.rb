@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_16_192722) do
+ActiveRecord::Schema.define(version: 2020_06_16_214836) do
+
+  create_table "games", force: :cascade do |t|
+    t.integer "player_one_id", null: false
+    t.string "player_one_board", limit: 100, null: false
+    t.string "player_one_moves_board", limit: 100, null: false
+    t.integer "player_two_id", null: false
+    t.string "player_two_board", limit: 100, null: false
+    t.string "player_two_moves_board", limit: 100, null: false
+    t.boolean "next_turn", null: false
+    t.integer "status", limit: 1, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["player_one_id"], name: "index_games_on_player_one_id"
+    t.index ["player_two_id"], name: "index_games_on_player_two_id"
+  end
 
   create_table "players", force: :cascade do |t|
     t.string "name"
@@ -19,4 +34,6 @@ ActiveRecord::Schema.define(version: 2020_06_16_192722) do
     t.index ["name"], name: "index_players_on_name", unique: true
   end
 
+  add_foreign_key "games", "player_ones"
+  add_foreign_key "games", "player_twos"
 end
