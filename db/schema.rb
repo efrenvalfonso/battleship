@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_16_214836) do
+ActiveRecord::Schema.define(version: 2020_06_16_215724) do
+
+  create_table "game_moves", force: :cascade do |t|
+    t.integer "game_id", null: false
+    t.integer "player_id", null: false
+    t.integer "row", limit: 1, null: false
+    t.string "column", limit: 1, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["game_id", "player_id", "row", "column"], name: "index_game_moves_on_game_id_and_player_id_and_row_and_column", unique: true
+    t.index ["game_id"], name: "index_game_moves_on_game_id"
+    t.index ["player_id"], name: "index_game_moves_on_player_id"
+  end
 
   create_table "games", force: :cascade do |t|
     t.integer "player_one_id", null: false
@@ -34,6 +46,8 @@ ActiveRecord::Schema.define(version: 2020_06_16_214836) do
     t.index ["name"], name: "index_players_on_name", unique: true
   end
 
+  add_foreign_key "game_moves", "games"
+  add_foreign_key "game_moves", "players"
   add_foreign_key "games", "player_ones"
   add_foreign_key "games", "player_twos"
 end
