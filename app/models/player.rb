@@ -1,4 +1,6 @@
 class Player < ApplicationRecord
+  validates_presence_of :name
+
   # has_many :games (association for games where player is player_one or player_two)
   def games
     games = Game.arel_table
