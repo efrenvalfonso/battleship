@@ -42,3 +42,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # RABL for API responses
 gem 'rabl', '~> 0.14.3'
+
+# KMP algorithm
+gem 'kmp', '~> 0.3.0'
