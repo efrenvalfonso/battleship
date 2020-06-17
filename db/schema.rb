@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_16_215724) do
+ActiveRecord::Schema.define(version: 2020_06_17_055231) do
 
   create_table "game_moves", force: :cascade do |t|
     t.integer "game_id", null: false
@@ -35,6 +35,8 @@ ActiveRecord::Schema.define(version: 2020_06_16_215724) do
     t.integer "status", limit: 1, default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "player_one_remaining_cells", default: 0, null: false
+    t.integer "player_two_remaining_cells", default: 0, null: false
     t.index ["player_one_id"], name: "index_games_on_player_one_id"
     t.index ["player_two_id"], name: "index_games_on_player_two_id"
   end
