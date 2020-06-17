@@ -26,13 +26,13 @@ class Api::V1::GamesController < ApplicationController
 
   # POST/PUT /games/1/attack
   def attack
-    if @game.attack!(coords[:x], coords[:y])
+    if @game.attack(coords[:x], coords[:y])
       game_move = GameMove.new game: @game, column: coords[:x], row: coords[:y]
       game_move.player_id = @game.player_one_id if @game.player_two_is_next?
       game_move.player_id = @game.player_two_id if @game.player_one_is_next?
       game_move.save
 
-      @game.finish!
+      @game.finish
 
       render :show
     else

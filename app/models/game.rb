@@ -47,13 +47,13 @@ class Game < ApplicationRecord
       attributes[:player_two_remaining_cells] = TOTAL_SHIPS_CELLS
       attributes[:status] = 1
     else
-      attributes[:player_one_board] = default_board unless attributes[:player_one_board].present?
-      attributes[:player_two_board] = default_board unless attributes[:player_two_board].present?
+      attributes[:player_one_board] = Game.default_board unless attributes[:player_one_board].present?
+      attributes[:player_two_board] = Game.default_board unless attributes[:player_two_board].present?
     end
 
     attributes.delete :random_boards
-    attributes[:player_one_moves_board] = default_board unless attributes[:player_one_moves_board].present?
-    attributes[:player_two_moves_board] = default_board unless attributes[:player_two_moves_board].present?
+    attributes[:player_one_moves_board] = Game.default_board unless attributes[:player_one_moves_board].present?
+    attributes[:player_two_moves_board] = Game.default_board unless attributes[:player_two_moves_board].present?
 
     super
   end
@@ -97,7 +97,7 @@ class Game < ApplicationRecord
     end
   end
 
-  def attack!(x, y)
+  def attack(x, y)
     if in_play?
       attacking, receiving = player_one_is_next? ? [:player_one, :player_two] : [:player_two, :player_one]
       if send("get_#{attacking}_moves_board", x, y) == :empty
@@ -125,7 +125,7 @@ class Game < ApplicationRecord
     end
   end
 
-  def start!
+  def start
     if !placing_ships?
       errors.add(:status, "must be 'placing_ships'")
       false
@@ -141,7 +141,7 @@ class Game < ApplicationRecord
     end
   end
 
-  def finish!
+  def finish
     if !in_play?
       errors.add(:status, "must be 'in_play'")
       false
@@ -204,6 +204,10 @@ class Game < ApplicationRecord
     BOARD_SIZE
   end
 
+  def self.default_board
+    '0' * (BOARD_SIZE[0] * BOARD_SIZE[1])
+  end
+
   def self.random_board
     # initialize an empty board
     rows = [nil] * BOARD_SIZE[1]
@@ -252,16 +256,5 @@ class Game < ApplicationRecord
 
     # build the board by rows
     rows.join
-  end
-
-
-  private
-
-  def default_board
-    unless @default_board
-      @default_board = '0' * (BOARD_SIZE[0] * BOARD_SIZE[1])
-    end
-
-    @default_board
   end
 end
