@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(version: 2020_06_16_215724) do
     t.integer "game_id", null: false
     t.integer "player_id", null: false
     t.integer "row", limit: 1, null: false
-    t.string "column", limit: 1, null: false
+    t.integer "column", limit: 1, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["game_id", "player_id", "row", "column"], name: "index_game_moves_on_game_id_and_player_id_and_row_and_column", unique: true
@@ -31,8 +31,8 @@ ActiveRecord::Schema.define(version: 2020_06_16_215724) do
     t.integer "player_two_id", null: false
     t.string "player_two_board", limit: 100, null: false
     t.string "player_two_moves_board", limit: 100, null: false
-    t.boolean "next_turn", null: false
-    t.integer "status", limit: 1, null: false
+    t.boolean "next_turn", default: false, null: false
+    t.integer "status", limit: 1, default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["player_one_id"], name: "index_games_on_player_one_id"
@@ -40,7 +40,7 @@ ActiveRecord::Schema.define(version: 2020_06_16_215724) do
   end
 
   create_table "players", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["name"], name: "index_players_on_name", unique: true
@@ -48,6 +48,6 @@ ActiveRecord::Schema.define(version: 2020_06_16_215724) do
 
   add_foreign_key "game_moves", "games"
   add_foreign_key "game_moves", "players"
-  add_foreign_key "games", "player_ones"
-  add_foreign_key "games", "player_twos"
+  add_foreign_key "games", "players", column: "player_one_id"
+  add_foreign_key "games", "players", column: "player_two_id"
 end
