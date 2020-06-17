@@ -17,7 +17,7 @@ class Game < ApplicationRecord
       :hit, # 7
       :sink # 8
   ]
-  TOTAL_SHIPS_CELLS = 15 # 1 + 2 + 3 + 4 + 5 (Patrol + Cruiser + Submarine + Battleship + Carrier)
+  TOTAL_SHIPS_CELLS = SHIPS.sum
 
   validates_presence_of :player_one,
                         :player_one_board,
@@ -35,6 +35,7 @@ class Game < ApplicationRecord
   validates_inclusion_of :status, in: %w[placing_ships in_play finished]
 
   enum status: {placing_ships: 0, in_play: 1, finished: 2}
+
 
   def initialize(attributes = nil)
     attributes = {} unless attributes
@@ -81,6 +82,33 @@ class Game < ApplicationRecord
       end
     else
       error.add(:status, "bust be 'placing_ships'")
+      false
+    end
+  end
+
+  def attack!(x, y)
+    if status.in_play?
+      attacking, receiving = player_one_is_next? ? [:player_one, :player_two] : [:player_two, :player_one]
+      if send("get_#{attacking}_moves_board", x, y) == :empty
+        if send("get_#{receiving}_board", x, y) == :empty
+          send("set_#{attacking}_moves_board", x, y, :fail)
+        else
+          send("set_#{attacking}_moves_board", x, y, :hit)
+
+          if player_one_is_next?
+            player_two_remaining_cells -= 1
+          else
+            player_one_remaining_cells -= 1
+          end
+
+          save
+        end
+      else
+        errors.add(:base, 'These coordinates were attacked previously.')
+        false
+      end
+    else
+      errors.add(:status, "must be 'in_play'")
       false
     end
   end
@@ -158,6 +186,7 @@ class Game < ApplicationRecord
       super
     end
   end
+
 
   def self.board_size
     BOARD_SIZE

@@ -1,4 +1,4 @@
-class GameMovesController < ApplicationController
+class Api::V1::GameMovesController < ApplicationController
   before_action :set_game_move, only: [:show, :update, :destroy]
 
   # GET /game_moves
