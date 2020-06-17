@@ -4,7 +4,7 @@ class CreateGameMoves < ActiveRecord::Migration[6.0]
       t.references :game, null: false, foreign_key: true
       t.references :player, null: false, foreign_key: true
       t.integer :row, limit: 1, null: false
-      t.string :column, limit: 1, null: false
+      t.integer :column, limit: 1, null: false
 
       t.timestamps
 
