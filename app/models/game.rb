@@ -39,16 +39,27 @@ class Game < ApplicationRecord
 
   def initialize(attributes = nil)
     attributes = {} unless attributes
-    attributes[:player_one_board] = default_board unless attributes[:player_one_board].present?
+
+    if attributes[:random_boards]
+      attributes[:player_one_board] = Game.random_board
+      attributes[:player_two_board] = Game.random_board
+      attributes[:player_one_remaining_cells] = TOTAL_SHIPS_CELLS
+      attributes[:player_two_remaining_cells] = TOTAL_SHIPS_CELLS
+      attributes[:status] = 1
+    else
+      attributes[:player_one_board] = default_board unless attributes[:player_one_board].present?
+      attributes[:player_two_board] = default_board unless attributes[:player_two_board].present?
+    end
+
+    attributes.delete :random_boards
     attributes[:player_one_moves_board] = default_board unless attributes[:player_one_moves_board].present?
-    attributes[:player_two_board] = default_board unless attributes[:player_two_board].present?
     attributes[:player_two_moves_board] = default_board unless attributes[:player_two_moves_board].present?
 
     super
   end
 
   def place_ship!(player, x, y, size, horizontal = true)
-    if status.placing_ships?
+    if placing_ships?
       remaining_cells_field = "#{player.to_s}_remaining_cells"
 
       if send(remaining_cells_field) < TOTAL_SHIPS_CELLS
@@ -87,22 +98,23 @@ class Game < ApplicationRecord
   end
 
   def attack!(x, y)
-    if status.in_play?
+    if in_play?
       attacking, receiving = player_one_is_next? ? [:player_one, :player_two] : [:player_two, :player_one]
       if send("get_#{attacking}_moves_board", x, y) == :empty
         if send("get_#{receiving}_board", x, y) == :empty
-          send("set_#{attacking}_moves_board", x, y, :fail)
+          send("set_#{attacking}_moves_board", x, y, :miss)
         else
           send("set_#{attacking}_moves_board", x, y, :hit)
 
           if player_one_is_next?
-            player_two_remaining_cells -= 1
+            self.player_two_remaining_cells -= 1
           else
-            player_one_remaining_cells -= 1
+            self.player_one_remaining_cells -= 1
           end
-
-          save
         end
+
+        self.next_turn = !self.next_turn
+        save
       else
         errors.add(:base, 'These coordinates were attacked previously.')
         false
@@ -114,7 +126,7 @@ class Game < ApplicationRecord
   end
 
   def start!
-    if !status.placing_ships?
+    if !placing_ships?
       errors.add(:status, "must be 'placing_ships'")
       false
     elsif player_one_remaining_cells < TOTAL_SHIPS_CELLS
@@ -124,13 +136,13 @@ class Game < ApplicationRecord
       errors.add(:player_two_remaining_cells, "must be '#{TOTAL_SHIPS_CELLS}'")
       false
     else
-      status.in_play!
+      in_play!
       save
     end
   end
 
   def finish!
-    if !status.in_play?
+    if !in_play?
       errors.add(:status, "must be 'in_play'")
       false
     elsif player_one_remaining_cells > 0 && player_one_remaining_cells > 0
@@ -138,26 +150,26 @@ class Game < ApplicationRecord
       errors.add(:player_two_remaining_cells, "must be '0'")
       false
     else
-      status.finished!
-      save
+      self.finished!
+      self.save
     end
   end
 
   def player_one_is_next?
-    next_turn
-  end
-
-  def player_two_is_next?
     !next_turn
   end
 
+  def player_two_is_next?
+    next_turn
+  end
+
   def player_one_won?
-    nil unless status.finished?
+    nil unless finished?
     player_one_remaining_cells == 0
   end
 
   def player_two_won?
-    nil unless status.finished?
+    nil unless finished?
     player_two_remaining_cells == 0
   end
 
